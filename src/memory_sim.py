@@ -7,9 +7,19 @@ class PageMap:
         self.virtual_page: int = virtual_page
         self.physical_page: int = physical_page
 
+    def __str__(self):
+        return f"{self.virtual_page} -->  {self.physical_page}"
+
 class PageMapper:
     def __init__(self, virtual_pages: int):
         self.page_maps: List[PageMap] = [PageMap(i, -1) for i in range(virtual_pages)]
+
+    def __str__(self):
+        result = ""
+        for page_map in self.page_maps:
+            if page_map.physical_page > -1:
+                result += str(page_map) + "\n"
+        return result
 
     def is_page_hit(self, virtual_page: int) -> bool:
         for page_map in self.page_maps:
@@ -30,16 +40,18 @@ class PageMapper:
             elif page_map.physical_page == physical_page:
                 page_map.physical_page = -1
 
+
 class MemorySim:
     FIFO = "FIFO"
     LRU = "LRU"
-    def __init__(self, virtual_pages: int, physical_pages: int, page_size: int, address_size: int):
+    def __init__(self, virtual_pages: int, physical_pages: int, page_size: int, address_size: int, print_logging: bool = False):
         self.page_faults = 0
         self.page_hits = 0
         self.virtual_pages: int= virtual_pages
         self.physical_pages: int = physical_pages
         self.page_size: int = page_size
         self.address_size: int = address_size
+        self.print_logging: bool = print_logging
         self.page_mapper = PageMapper(virtual_pages)
 
         self.first_in: List[int] = [i for i in range(physical_pages)]
@@ -68,11 +80,16 @@ class MemorySim:
             physical_page: int = self.last_recently_used.pop(0)
             self.page_mapper.update_page(virtual_page, physical_page)
             self.last_recently_used.append(physical_page)
+            if self.print_logging:
+                print(f"Page Fault on {virtual_page}")
+                print(f"Loading {virtual_page} --> {physical_page}")
         else:
             self.record_page_hit()
             physical_page: int = self.page_mapper.get_physical_page_from_virtual(virtual_page)
             self.last_recently_used.remove(physical_page)
             self.last_recently_used.append(physical_page)
+            if self.print_logging:
+                print(f"Page hit on {virtual_page} --> {physical_page}")
 
     def load_pageframe_FIFO(self, virtual_page):
         if not self.page_mapper.is_page_hit(virtual_page):
@@ -83,10 +100,14 @@ class MemorySim:
         else:
             self.record_page_hit()
 
+
     def run(self, algorithm: str, iterations: int):
         for i in range(iterations):
             self.step(algorithm)
+            if self.print_logging:
+                print(self.page_mapper)
 
+        print(f"    Ran {algorithm} for {iterations} Iterations:    ")
         print(f"Page Faults: {self.page_faults} - Page Hits: {self.page_hits}")
 
     def step(self, algorithm: str):
