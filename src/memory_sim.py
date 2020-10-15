@@ -9,16 +9,22 @@ class PageMap:
 
 class PageMapper:
     def __init__(self, virtual_pages: int):
-        self.page_map: List[PageMap] = [PageMap(i, -1) for i in range(virtual_pages)]
+        self.page_maps: List[PageMap] = [PageMap(i, -1) for i in range(virtual_pages)]
 
     def is_page_hit(self, virtual_page: int) -> bool:
-        for page_map in self.page_map:
+        for page_map in self.page_maps:
             if page_map.virtual_page == virtual_page:
                 return page_map.physical_page > -1
         return False
+
+    def get_physical_page_from_virtual(self, virtual_page: int) -> int:
+        for page_map in self.page_maps:
+            if page_map.virtual_page == virtual_page:
+                return page_map.physical_page
+        return -1
     
     def update_page(self, virtual_page, physical_page):
-        for page_map in self.page_map:
+        for page_map in self.page_maps:
             if page_map.virtual_page == virtual_page:
                 page_map.physical_page = physical_page
             elif page_map.physical_page == physical_page:
@@ -37,6 +43,7 @@ class MemorySim:
         self.page_mapper = PageMapper(virtual_pages)
 
         self.first_in: List[int] = [i for i in range(physical_pages)]
+        self.last_recently_used: List[int] = [i for i in range(physical_pages)]
 
     def get_max_virtual_address(self) -> int:
         return int(self.virtual_pages * self.page_size / self.address_size - 1)
@@ -56,7 +63,16 @@ class MemorySim:
         self.page_hits += 1
 
     def load_pageframe_LRU(self, virtual_page):
-        pass
+        if not self.page_mapper.is_page_hit(virtual_page):
+            self.record_page_fault()
+            physical_page: int = self.last_recently_used.pop(0)
+            self.page_mapper.update_page(virtual_page, physical_page)
+            self.last_recently_used.append(physical_page)
+        else:
+            self.record_page_hit()
+            physical_page: int = self.page_mapper.get_physical_page_from_virtual(virtual_page)
+            self.last_recently_used.remove(physical_page)
+            self.last_recently_used.append(physical_page)
 
     def load_pageframe_FIFO(self, virtual_page):
         if not self.page_mapper.is_page_hit(virtual_page):

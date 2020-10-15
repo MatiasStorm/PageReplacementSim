@@ -26,3 +26,9 @@ class TestMemorySim:
         assert ms.page_hits == 2
         assert ms.page_faults == 7
 
+    def test_LRU(self):
+        ms = MemorySim(16, 4, 1024, 1)
+        for page in [0,7,2,7,5,8,9,2,4]:
+            ms.load_pageframe_LRU(page)
+        assert ms.page_hits == 1
+        assert ms.page_faults == 8
