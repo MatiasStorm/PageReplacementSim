@@ -23,8 +23,8 @@ A page fault happens when a program tries to fetch data from a virtual page whic
 ### FIFO (First In First Out)
 This algorithm selects the first physical page that was loaded to be overwritten if a page fault occurs.
 
-### LRU (Last Recently Used)
-This algorithm selects the last recently used physical page to be overwritten when a page fault occurs.
+### LRU (Least Recently Used)
+This algorithm selects the least recently used physical page to be overwritten when a page fault occurs.
 
 ## Run
 run `python main.py`
