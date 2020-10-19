@@ -26,6 +26,17 @@ This algorithm selects the first physical page that was loaded to be overwritten
 ### LRU (Least Recently Used)
 This algorithm selects the least recently used physical page to be overwritten when a page fault occurs.
 
+## Modify simulation:
+You can change the following global variables in [main.py](src/main.py) to alter the simulation parameters.
+```
+VIRTUAL_PAGES = 8
+PHYSICAL_PAGES = 4
+PAGE_FRAMES = 4
+PAGE_SIZE = 1024 # Bytes
+ADDRESS_SIZE = 4 # Bytes
+ITERATIONS = 1000
+```
+
 ## Run
 run `python main.py`
 
