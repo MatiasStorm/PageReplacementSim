@@ -7,7 +7,7 @@ then a page replacement algorithm is used to select which physical pages are to 
 A page fault happens when a program tries to fetch data from a virtual page which is not loaded into main memory.
 
 ## Example of a virtual to physical memory mapping
-| Virual page | Physical Page | Page fault if addressed |
+| Vitual page | Physical Page | Page fault if addressed |
 |-------------|---------------|-------------------------|
 | 0           | NaN           | Yes                     |
 | 1           | 3             | No                      |
